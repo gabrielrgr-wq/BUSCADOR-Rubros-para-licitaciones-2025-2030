@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a3a73">
+<title>Buscador de Rubros · Licitaciones 2025-2030 · Intendencia de Canelones</title>
+<meta name="description" content="Buscador interactivo de la Definición de los rubros para licitaciones 2025-2030 (Dirección General de Obras, Intendencia de Canelones). Escriba una palabra y obtenga el rubro, la respuesta y la referencia al documento.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8E%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<a class="skip" href="#resultados">Saltar a los resultados</a>
+<div id="fatal" class="fatal" role="alert" hidden></div>
+<noscript><div class="fatal">Este buscador necesita JavaScript habilitado.</div></noscript>
+
+<header class="hero" id="hero">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="wrap hero-in">
+    <div class="brand">
+      <div>
+        <p class="eyebrow">Intendencia de Canelones · Dirección General de Obras</p>
+        <h1>Buscador de <em>rubros</em><span>Licitaciones 2025-2030</span></h1>
+      </div>
+      <button id="themeBtn" class="icon-btn" type="button" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">◐</button>
+    </div>
+
+    <div class="searchwrap">
+      <form id="searchForm" class="searchbox" role="search" autocomplete="off">
+        <label for="q" class="sr">Buscar en la definición de rubros</label>
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4.2-4.2"/></svg>
+        <input id="q" type="search" enterkeyhint="search" placeholder="Escriba una palabra: bacheo, cordón cuneta, CBR 80, 541…" spellcheck="false" aria-autocomplete="list" aria-controls="suggest">
+        <button class="go" type="submit">Buscar</button>
+      </form>
+      <ul id="suggest" class="suggest" role="listbox" hidden></ul>
+    </div>
+
+    <div class="chips" id="chips" aria-label="Ejemplos de búsqueda"></div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+</header>
+
+<nav class="tabs wrap" aria-label="Vistas">
+  <button class="tab active" id="tabBuscar" type="button" aria-selected="true">Buscador</button>
+  <button class="tab" id="tabCatalogo" type="button" aria-selected="false">Catálogo de rubros</button>
+</nav>
+
+<main class="wrap">
+  <section id="viewBuscar">
+    <details class="filters-box" id="filtersBox">
+      <summary>Filtros <span id="filterBadge" class="badge" hidden></span></summary>
+      <div class="filters" aria-label="Filtros">
+        <label>Grupo <select id="fGrupo"><option value="">Todos</option></select></label>
+        <label>Unidad <select id="fUnidad"><option value="">Todas</option></select></label>
+        <label>Ámbito
+          <select id="fAmbito">
+            <option value="">Rubros y especificaciones generales</option>
+            <option value="rubro">Solo rubros</option>
+            <option value="general">Solo especificaciones generales</option>
+          </select>
+        </label>
+        <button id="clearBtn" class="ghost" type="button">Limpiar todo</button>
+      </div>
+    </details>
+
+    <div id="scrollTarget"></div>
+    <p id="count" class="count" aria-live="polite"></p>
+    <div id="answer"></div>
+    <div id="resultados" tabindex="-1"></div>
+    <div class="more"><button id="moreBtn" class="ghost" type="button" hidden>Mostrar más resultados</button></div>
+
+    <div id="welcome" class="welcome">
+      <h2>Explorar por tema</h2>
+      <p class="lead">Elija un tema o escriba arriba. Cada respuesta indica <strong>rubro, unidad y página</strong> del documento.</p>
+      <div class="tiles" id="tiles"></div>
+      <div class="tips">
+        <div><b>🔤 Palabras</b><span>Ignora tildes y mayúsculas; entiende sinónimos (caño = alcantarilla, concreto = hormigón).</span></div>
+        <div><b>🔢 Códigos</b><span>Pruebe <em>103</em>, <em>7a</em> u <em>OT-12</em>.</span></div>
+        <div><b>💲 Pago</b><span>Agregue <em>pago</em> o <em>medición</em>: “cuánto se paga el bacheo”.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewCatalogo" hidden>
+    <div class="filters">
+      <label class="grow">Filtrar el listado
+        <input id="catQ" type="search" placeholder="Código o parte del nombre…">
+      </label>
+      <label>Grupo <select id="cGrupo"><option value="">Todos</option></select></label>
+      <label>Unidad <select id="cUnidad"><option value="">Todas</option></select></label>
+    </div>
+    <p id="catCount" class="count"></p>
+    <div class="table-wrap">
+      <table id="catTable">
+        <thead><tr><th>Rubro</th><th>Descripción</th><th>Unidad</th><th>Grupo</th><th>Pág.</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>Fuente: <a id="pdfLink" href="docs/Definicion_de_los_rubros_licitaciones_2025-2030.pdf" target="_blank" rel="noopener">Definición de los rubros para licitaciones 2025-2030</a>, Dirección General de Obras – Oficina Técnica de Canelones, febrero 2025. Herramienta de consulta: ante cualquier duda rige el texto del documento original.</p>
+</footer>
+
+<aside id="drawer" class="drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="drTitle">
+  <div class="drawer-bg" data-close></div>
+  <div class="drawer-panel">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="drawer-head">
+      <div>
+        <p class="eyebrow" id="drKicker"></p>
+        <h2 id="drTitle"></h2>
+        <div class="meta" id="drMeta"></div>
+      </div>
+      <button class="icon-btn" type="button" data-close aria-label="Cerrar">✕</button>
+    </div>
+    <div class="drawer-actions" id="drActions"></div>
+    <div class="drawer-body" id="drBody"></div>
+  </div>
+</aside>
+
+<button id="toTop" class="totop" type="button" aria-label="Volver arriba" hidden>↑</button>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="data/rubros.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
